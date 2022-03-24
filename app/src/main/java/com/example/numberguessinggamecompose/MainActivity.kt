@@ -128,6 +128,9 @@ fun NumberGuessingGame(context: Context) {
                                 ans = "win"
                                 text = "Congratulations! Your answer is correct."
                                 Toast.makeText(context,"Correct!", Toast.LENGTH_LONG).show()
+                                r.value = nextInt(1, 1000)
+                                life.value = 20
+                                input = ""
                             }
                             input.toInt() > r.value -> {
                                 ans = "wrong"
@@ -143,19 +146,28 @@ fun NumberGuessingGame(context: Context) {
                             }
                         }
                     }
+                    if (life.value == 0) {
+                        ans = "over"
+                        r.value = nextInt(1, 1000)
+                        life.value = 20
+                        input = ""
+                    }
                 })
             TextButton(
                 string = "reset",
                 onClick = {
                     ans = "reset"
                     r.value = nextInt(1, 1000)
-                    life.value = 10
+                    life.value = 20
                     input = ""
                 })
             TextButton(
                 string = "surrender",
                 onClick = {
                     ans = "sur"
+                    r.value = nextInt(1, 1000)
+                    life.value = 20
+                    input = ""
                 })
         }
         if (ans == "win") {
@@ -193,11 +205,7 @@ fun NumberGuessingGame(context: Context) {
                     .fillMaxWidth()
                     .padding(8.dp)
             )
-        }
-        if (life.value == 0) {
-            r.value = nextInt(1, 1000)
-            life.value = 20
-            input = ""
+        } else if (ans == "over") {
             Text(
                 text = "Game Over",
                 fontSize = 20.sp,
