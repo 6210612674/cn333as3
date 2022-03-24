@@ -6,13 +6,21 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +40,7 @@ class MainActivity : ComponentActivity() {
             NumberGuessingGameComposeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.background,
                 ) {
                     NumberGuessingGame(this)
                 }
@@ -53,9 +61,16 @@ fun NumberGuessingGame(context: Context) {
     var input by remember { mutableStateOf("") }
     var text by rememberSaveable { mutableStateOf("") }
     var ans by rememberSaveable { mutableStateOf("") }
-
+    
     Column(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxHeight()
+            .background(
+                brush = Brush.horizontalGradient(
+                    listOf(Color.Blue, Color.Red)
+                ),
+                alpha = 0.25F
+            ),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -63,8 +78,13 @@ fun NumberGuessingGame(context: Context) {
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
+                .padding(20.dp)
+                .fillMaxWidth()
+                .background(
+                    brush = SolidColor(Color.Yellow),
+                    shape = RoundedCornerShape(24.dp),
+                    alpha = 0.5F
+                ),
             fontWeight = FontWeight.Bold,
         )
         Text(
@@ -95,7 +115,7 @@ fun NumberGuessingGame(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             TextButton(
                 string = "submit",
@@ -208,6 +228,9 @@ fun NumberGuessingGame(context: Context) {
 @Composable
 fun TextButton(string: String, onClick: () -> Unit) {
     Button(
+        modifier = Modifier
+            .padding(all=0.dp),
+        colors= ButtonDefaults.buttonColors(backgroundColor = Color.White),
         onClick = onClick
     ) {
         Text(text = "$string", fontSize = 14.sp)
