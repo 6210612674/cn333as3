@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -22,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import com.example.numberguessinggamecompose.ui.theme.NumberGuessingGameComposeTheme
-import java.util.*
+import kotlin.random.Random.Default.nextInt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,18 +42,17 @@ class MainActivity : ComponentActivity() {
 }
 
 fun randomNumber(): Int {
-    val r = Random()
-    val num = r.nextInt(1000)
+    val num = nextInt(1, 1000)
     return num
 }
 
 @Composable
 fun NumberGuessingGame(context: Context) {
-    var r by rememberSaveable { mutableStateOf(randomNumber()) }
-    var life = remember { mutableStateOf(0) }
+    var r = remember { mutableStateOf(randomNumber()) }
+    var life = remember { mutableStateOf(20) }
     var input by remember { mutableStateOf("") }
     var text by rememberSaveable { mutableStateOf("") }
-    var ans by rememberSaveable { mutableStateOf(false) }
+    var ans by rememberSaveable { mutableStateOf("") }
 
     Column(
         modifier = Modifier.fillMaxHeight(),
@@ -104,50 +104,99 @@ fun NumberGuessingGame(context: Context) {
                         Toast.makeText(context,"Please enter number", Toast.LENGTH_LONG).show();
                     } else {
                         when {
-                            input.toInt() == r -> {
-                                ans = true
-                                text = "Congratulations!"
+                            input.toInt() == r.value -> {
+                                ans = "win"
+                                text = "Congratulations! Your answer is correct."
                                 Toast.makeText(context,"Correct!", Toast.LENGTH_LONG).show()
                             }
-                            input.toInt() > r -> {
-                                text = "Hint: It's higher!"
+                            input.toInt() > r.value -> {
+                                ans = "wrong"
+                                text = "Hint: It's lower!"
                                 Toast.makeText(context,"Wrong!", Toast.LENGTH_LONG).show();
                                 life.value--
                             }
-                            input.toInt() < r -> {
-                                text = "Hint: It's lower!"
+                            input.toInt() < r.value -> {
+                                ans = "wrong"
+                                text = "Hint: It's higher!"
                                 Toast.makeText(context,"Wrong!", Toast.LENGTH_LONG).show();
                                 life.value--
                             }
                         }
                     }
                 })
-            TextButton(string = "reset", onClick = {})
-            TextButton(string = "surrender", onClick = {})
+            TextButton(
+                string = "reset",
+                onClick = {
+                    ans = "reset"
+                    r.value = nextInt(1, 1000)
+                    life.value = 10
+                    input = ""
+                })
+            TextButton(
+                string = "surrender",
+                onClick = {
+                    ans = "sur"
+                })
         }
-        if (ans) {
+        if (ans == "win") {
             Text(
                 text = text,
-                fontSize = 16.sp,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             )
-        } else {
+        } else if (ans == "wrong") {
             Text(
                 text = text,
                 fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+        } else if (ans == "sur") {
+            Text(
+                text = "You Lose, Reset to restart.",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+            Text(
+                text = "The Correct Answer is ${r.value}",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             )
         }
         if (life.value == 0) {
+            r.value = nextInt(1, 1000)
+            life.value = 20
+            input = ""
             Text(
                 text = "Game Over",
-                fontSize = 16.sp,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             )
             Text(
-                text = "The Correct Answer is $r",
+                text = "The Correct Answer is ${r.value}",
                 fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             )
         }
         Text(
-            text = "Life: $life",
+            text = "Life: ${life.value}",
             fontSize = 14.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -156,7 +205,6 @@ fun NumberGuessingGame(context: Context) {
         )
     }
 }
-
 @Composable
 fun TextButton(string: String, onClick: () -> Unit) {
     Button(
